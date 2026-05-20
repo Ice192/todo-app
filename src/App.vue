@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue';
 import TodoInput from './Components/TodoInput.vue';
+import TodoFilters from './Components/TodoFilter.vue';
 
 type Task = {
   id: number
@@ -95,11 +96,9 @@ onMounted(() => {
 
     <input type="text" placeholder="search here..." v-model="search" class="search-input">
 
-    <div class="filters">
-      <button @click="activeFilter = f" v-for="f in filters" :key="f" :class="{ active: activeFilter === f }">
-        {{ f }}
-      </button>
-    </div>
+    <TodoFilters :filters="filters" :active-filter="activeFilter"
+      @change-filter="(filter: string) => activeFilter = filter" />
+
     <ul class="task-list">
       <li v-for="task in filteredTasks" :key="task.id"
         :class="{ done: task.completed, editing: editingId === task.id }">
