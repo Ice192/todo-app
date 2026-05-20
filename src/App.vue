@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue';
+import TodoInput from './Components/TodoInput.vue';
 
 type Task = {
   id: number
@@ -8,23 +9,20 @@ type Task = {
   favorite: boolean
 }
 
-const newTask = ref<string>('')
 const tasks = ref<Task[]>([])
 
-function addTask() {
-  const text = newTask.value.trim()
-  if (!text) {
+function addTask(text: string) {
+  const trimmed = text.trim()
+  if (!trimmed) {
     return
   }
 
   tasks.value.push({
     id: Date.now(),
-    text: text,
+    text: trimmed,
     completed: false,
     favorite: false
   })
-
-  newTask.value = ''
 
 }
 
@@ -93,10 +91,7 @@ onMounted(() => {
   <div class="wrapper">
     <h1>Todo App</h1>
 
-    <div class="input-row">
-      <input type="text" placeholder="add task here..." v-model="newTask">
-      <button @click="addTask">Add</button>
-    </div>
+    <TodoInput @add="addTask" />
 
     <input type="text" placeholder="search here..." v-model="search" class="search-input">
 
@@ -137,12 +132,6 @@ onMounted(() => {
   margin: 2rem auto;
   font-family: sans-serif;
   text-align: center;
-}
-
-.input-row {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 input {
