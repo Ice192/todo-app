@@ -115,12 +115,15 @@ onMounted(() => {
         </template>
 
         <template v-else>
-          <button class="delete" @click="removeTask(task.id)">X</button>
-          <button class="fav" @click="toggleFav(task)">
-            {{ task.favorite ? '★' : '☆' }}
-          </button>
-          <input type="checkbox" v-model="task.completed">
-          <span @click="startEdit(task)">{{ task.text }}</span>
+          <div class="task-content">
+            <button class="delete" @click="removeTask(task.id)">X</button>
+            <button class="fav" @click="toggleFav(task)">
+              {{ task.favorite ? '★' : '☆' }}
+            </button>
+            <input class="task-checkbox" type="checkbox" v-model="task.completed">
+            <span class="task-text" @click="startEdit(task)">{{ task.text }}</span>
+
+          </div>
         </template>
       </li>
     </ul>
@@ -129,7 +132,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.app {
+.wrapper {
   max-width: 500px;
   margin: 2rem auto;
   font-family: sans-serif;
@@ -159,14 +162,37 @@ button {
 .task-list {
   list-style: none;
   padding: 0;
+  text-align: left;
+}
+
+.task-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .task-list li {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   /* padding: 0.5rem; */
   border-bottom: 1px solid #ccc
+}
+
+.task-checkbox {
+  flex: 0 0 auto;
+}
+
+.task-text {
+  flex: 1;
+  text-align: left;
+}
+
+.task-list li span {
+  text-align: left;
 }
 
 .task-list li.done span {
