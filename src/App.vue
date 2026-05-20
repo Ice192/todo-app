@@ -2,6 +2,7 @@
 import { computed, ref, watch, onMounted } from 'vue';
 import TodoInput from './Components/TodoInput.vue';
 import TodoFilters from './Components/TodoFilter.vue';
+import TodoItem from './Components/TodoItem.vue';
 
 type Task = {
   id: number
@@ -59,8 +60,18 @@ function finishEdit(task: Task) {
   cancelEdit()
 }
 
-function toggleFav(task: Task) {
+function toggleFav(id: number) {
+  const task = tasks.value.find((t) => t.id === id)
+  if (!task) return
+
   task.favorite = !task.favorite
+}
+
+function toggleCompleted(id: number) {
+  const task = tasks.value.find((t) => t.id === id)
+  if (!task) return
+
+  task.completed = !task.completed
 }
 
 const search = ref('')
@@ -109,15 +120,8 @@ onMounted(() => {
         </template>
 
         <template v-else>
-          <div class="task-content">
-            <button class="delete" @click="removeTask(task.id)">X</button>
-            <button class="fav" @click="toggleFav(task)">
-              {{ task.favorite ? '★' : '☆' }}
-            </button>
-            <input class="task-checkbox" type="checkbox" v-model="task.completed">
-            <span class="task-text" @click="startEdit(task)">{{ task.text }}</span>
-
-          </div>
+          <TodoItem v-for="task in filteredTasks" :key="task.id" :task="task" @remove="removeTask"
+            @toggle-fav="toggleFav" @toggle-completed="toggleCompleted" />
         </template>
       </li>
     </ul>
