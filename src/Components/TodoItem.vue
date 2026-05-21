@@ -1,4 +1,35 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
+const isEditing = ref(false)
+const editingBuffer = ref('')
+
+const props = defineProps<{
+    task: Task
+}>()
+function startEdit() {
+    isEditing.value = true
+    editingBuffer.value = props.task.text
+}
+
+function cancelEdit() {
+    isEditing.value = false
+    editingBuffer.value = ''
+}
+
+function finishEdit() {
+    if (!isEditing.value) {
+        return
+    }
+
+    const trimmed = editingBuffer.value.trim()
+
+    emit('updateText', props.task.id, trimmed)
+
+    isEditing.value = false
+    editingBuffer.value = ''
+}
+
 type Task = {
     id: number
     text: string
@@ -6,14 +37,12 @@ type Task = {
     favorite: boolean
 }
 
-defineProps<{
-    task: Task
-}>()
 
 const emit = defineEmits<{
     remove: [id: number]
     toggleFav: [id: number]
     toggleCompleted: [id: number]
+    updateText: [id: number, text: string]
 }>()
 </script>
 
@@ -29,9 +58,16 @@ const emit = defineEmits<{
             <input class="task-checkbox" type="checkbox" :checked="task.completed"
                 @change="emit('toggleCompleted', task.id)">
 
-            <span class="task-text">
-                {{ task.text }}
-            </span>
+            <template v-if="isEditing">
+                <input type="text" v-model="editingBuffer" class="edit-input" @keyup.enter="finishEdit"
+                    @keydown.esc.prevent="cancelEdit" @blur="finishEdit">
+            </template>
+
+            <template v-else>
+                <span class="task-text" @click="startEdit">
+                    {{ task.text }}
+                </span>
+            </template>
         </div>
     </li>
 </template>
@@ -87,5 +123,13 @@ li.done .task-text {
 
 .fav:hover {
     transform: scale(1.2, 1.2);
+}
+
+.edit-input {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: 1px solid #333;
+    border-radius: 6px;
+    font-size: 1rem;
 }
 </style>

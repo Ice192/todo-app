@@ -32,32 +32,19 @@ function removeTask(id: number) {
   tasks.value = tasks.value.filter((t) => t.id !== id)
 }
 
-const editingId = ref<number | null>(null)
-const editingBuffer = ref<string>('')
-function startEdit(task: Task) {
-  editingId.value = task.id
-  editingBuffer.value = task.text
-}
+function updateTaskText(id: number, text: string) {
+  const task = tasks.value.find((t) => t.id === id)
 
-function cancelEdit() {
-  editingId.value = null
-  editingBuffer.value = ''
-}
-
-function finishEdit(task: Task) {
-  if (editingId.value !== task.id) {
+  if (!task) {
     return
   }
 
-  const trimmed = editingBuffer.value.trim()
-
-  if (!trimmed) {
-    removeTask(task.id)
-  } else {
-    task.text = trimmed
+  if (!text) {
+    removeTask(id)
+    return
   }
 
-  cancelEdit()
+  task.text = text
 }
 
 function toggleFav(id: number) {
@@ -109,21 +96,9 @@ onMounted(() => {
 
     <TodoFilters :filters="filters" :active-filter="activeFilter"
       @change-filter="(filter: string) => activeFilter = filter" />
-
-    <ul class="task-list">
-      <li v-for="task in filteredTasks" :key="task.id"
-        :class="{ done: task.completed, editing: editingId === task.id }">
-
-        <template v-if="editingId === task.id">
-          <input type="text" v-model="editingBuffer" class="edit-input" @keyup.enter="finishEdit(task)"
-            @keydown.esc="cancelEdit" @blur="finishEdit(task)">
-        </template>
-
-        <template v-else>
-          <TodoItem v-for="task in filteredTasks" :key="task.id" :task="task" @remove="removeTask"
-            @toggle-fav="toggleFav" @toggle-completed="toggleCompleted" />
-        </template>
-      </li>
+    <ul>
+      <TodoItem v-for="task in filteredTasks" :key="task.id" :task="task" @remove="removeTask" @toggle-fav="toggleFav"
+        @toggle-completed="toggleCompleted" @update-text="updateTaskText" />
     </ul>
   </div>
 
